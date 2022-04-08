@@ -1,0 +1,64 @@
+
+"Games"
+{
+    "tf"
+    {
+        // CBaseServer::WriteTempEntities( CBaseClient *client, CFrameSnapshot *pCurrentSnapshot, CFrameSnapshot *pLastSnapshot, bf_write &buf, int ev_max )
+        "Functions"
+        {
+            "WriteTempEntities"
+            {
+                "signature"     "CBaseServer::WriteTempEntities"
+                "callconv"      "thiscall"
+                "return"        "void"
+                "this"          "ignore"
+                "arguments"
+                {
+                    "client"
+                    {
+                        "type"      "cbaseentity"
+                    }
+                    "pCurrentSnapshot"
+                    {
+                        "type"      "objectptr"
+                    }
+                    "pLastSnapshot"
+                    {
+                        "type"      "objectptr"
+                    }
+                    "buf"
+                    {
+                        "type"      "objectptr"
+                    }
+                    "ev_max"
+                    {
+                        "type"      "int"
+                    }
+                }
+            }
+        }
+
+        "Signatures"
+        {
+            "CBaseServer::WriteTempEntities"
+            {
+                "library"   "engine"
+                "linux"     "@_ZN11CBaseServer17WriteTempEntitiesEP11CBaseClientP14CFrameSnapshotS3_R8bf_writei"
+                // Signature for sub_1013C160:
+                // 55 8B EC B8 9C 65 04 00 E8 ? ? ? ? 8B 15 ? ? ? ?
+                "windows"   "\x55\x8B\xEC\xB8\x9C\x65\x04\x00\xE8\x2A\x2A\x2A\x2A\x8B\x15\x2A\x2A\x2A\x2A"
+            }
+        }
+        "Offsets"
+        {
+            "CBaseClient::GetPlayerSlot"
+            {
+                "linux"     "6"
+                // wat
+                "windows"   "14"
+            }
+        }
+    }
+}
+
+
