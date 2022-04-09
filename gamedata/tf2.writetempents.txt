@@ -16,7 +16,7 @@
                 {
                     "client"
                     {
-                        "type"      "cbaseentity"
+                        "type"      "int"
                     }
                     "pCurrentSnapshot"
                     {
@@ -53,7 +53,7 @@
         {
             "CBaseClient::GetPlayerSlot"
             {
-                "linux"     "6"
+                "linux"     "3"
                 // wat
                 "windows"   "14"
             }

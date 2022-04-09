@@ -3,6 +3,7 @@
 
 Handle hGameData;
 
+char os[8];
 
 public void OnPluginStart()
 {
@@ -32,32 +33,41 @@ public void OnPluginStart()
         SetFailState("Failed to detour WriteTempEntities.");
     }
 
+    checkOS();
+
     PrintToServer("WriteTempEntities detoured!");
 }
 
 public MRESReturn Detour_WriteTempEnts(Handle hParams)
 {
     // Horrible Evil Bullshit
+
     // Addr of CBaseClient ptr
-    Address pCBaseClient = DHookGetParamAddress(hParams, 1);
+    Address pCBaseClient = DHookGetParam(hParams, 1);
+    if (StrEqual(os, "windows"))
+    {
+        // we need to +4 the ptr if we're on windows because vtable nonsense
+        pCBaseClient = pCBaseClient + view_as<Address>(0x4);
+    }
     // player index is playerslot+1
     // https://cs.sappho.io/xref/hl2_src/engine/baseclient.cpp#1680
-    int iClient = view_as<int>(GetPlayerSlot(pCBaseClient)) + 1;
+    int iClient = view_as<int>(GetPlayerSlot( pCBaseClient ) ) + 1;
 
     Address pCurrentSnapshot    = DHookGetParamAddress(hParams, 2);
     Address pLastSnapshot       = DHookGetParamAddress(hParams, 3);
     Address buf                 = DHookGetParamAddress(hParams, 4);
 
 
-
     PrintToServer("\
         ======================================\n\
         CBaseServer::WriteTempEntities called.\n\
         -   client index                %i\n\
+        -   client name                 %L\n\
         -  *pCurrentSnapshot            %x\n\
         -  *pLastSnapshot               %x\n\
         -  &buf                         %x\n\
         -   ev_max                      %i\n",
+        iClient,
         iClient,
         pCurrentSnapshot,
         pLastSnapshot,
@@ -105,9 +115,6 @@ public MRESReturn Detour_WriteTempEnts(Handle hParams)
     int         m_iExplicitDeleteSlots      = LoadFromAddress(pCurrentSnapshot + view_as<Address>(0x3C), NumberType_Int32);
     Address     m_nReferences               = LoadFromAddress(pCurrentSnapshot + view_as<Address>(0x60), NumberType_Int32);
 
-
-
-
     PrintToServer("\
         *pCurrentSnapshot guessed data:   \n\
         -   m_ListIndex                 %i\n\
@@ -135,14 +142,13 @@ public MRESReturn Detour_WriteTempEnts(Handle hParams)
         m_nTempEntities,
         m_iExplicitDeleteSlots,
         m_nReferences
-);
-
+    );
 
     return MRES_Ignored;
 }
 
 
-stock any GetPlayerSlot(Address pIClient)
+any GetPlayerSlot(Address pIClient)
 {
     static Handle hPlayerSlot = INVALID_HANDLE;
     if (hPlayerSlot == INVALID_HANDLE)
@@ -154,4 +160,25 @@ stock any GetPlayerSlot(Address pIClient)
     }
 
     return SDKCall(hPlayerSlot, pIClient);
+}
+
+// stolen from stac
+void checkOS()
+{
+    // only need the beginning of this
+    char cmdline[32];
+    GetCommandLine(cmdline, sizeof(cmdline));
+
+    if (StrContains(cmdline, "./srcds_linux ", false) != -1)
+    {
+        os = "linux";
+    }
+    else if (StrContains(cmdline, ".exe", false) != -1)
+    {
+        os = "windows";
+    }
+    else
+    {
+        os = "unknown";
+    }
 }
